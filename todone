@@ -41,7 +41,7 @@ function delete_item () {
     printf "Enter an number then ENTER to delete an item:\n"
     read item
     item_to_delete=$(($item -1))
-    ITEMS=(${ITEMS[@]:0:$item_to_delete} ${ITEMS[@]:$(($item_to_delete + 1))})
+    ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete + 1))}")
     show_todo_list
 }
 
@@ -52,7 +52,8 @@ function complete_item () {
     read item
     item_to_complete=$(($item -1))
     COMPLETED_ITEMS+=("${item}")
-    ITEMS=(${ITEMS[@]:0:$item_to_complete} ${ITEMS[@]:$(($item_to_delete + 1))})
+    ITEMS=("${ITEMS[@]:0:$item_to_complete}" "${ITEMS[@]:$(($item_to_delete +
+    1))}")
     show_todo_list
 
 }
