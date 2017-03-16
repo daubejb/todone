@@ -1,12 +1,20 @@
 #!/bin/bash
 # by Jeff Daube
 
+# Todo -
+# 1. Add ability to launch todone from anywhere and have file.txt source from
+# ~/ directory
+# 2. Add ability to prioritize items; rearange them
+# 3. Upon completion: append date time to end of item
+
+
 # MENU PROMPTS
 #------------------------------------------------------------------------------
 
 ADD_MENU="(a) - Add an item"
 DELETE_MENU="(d) - Delete an item"
 COMPLETE_MENU="(c) - Complete an item"
+PRIORITIZE_MENU="(p) - Prioritize list"
 
 # GLOBAL VARIABLES
 #------------------------------------------------------------------------------
@@ -15,6 +23,7 @@ ITEMS=()
 COMPLETED_ITEMS=()
 MSG=
 only_on_load=true
+MODE="normal"
 
 # MENU FUNCTION DEFINITIONS
 #------------------------------------------------------------------------------
@@ -104,6 +113,7 @@ function show_main_menu_options () {
     printf "\t${ADD_MENU}\n"
     printf "\t${DELETE_MENU}\n"
     printf "\t${COMPLETE_MENU}\n"
+    printf "\t${PRIORITIZE_MENU}\n"
     printf "\t(x) - to exit\n"
     echo
     if [ "${MSG}" ]; then
@@ -114,6 +124,32 @@ function show_main_menu_options () {
     return
 }
 
+function show_prioritize_menu_options () {
+    echo
+    echo
+    printf "Enter a item # to prioritize:\n"
+    return
+}
+
+#function highlight_item () {
+
+
+function enter_prioritize_mode () {
+    clear
+    number_of_list_items=${#ITEMS[@]}
+    while true
+    do
+        show_todo_list
+        show_prioritize_menu_options
+        read answer
+        MSG=
+        case $answer in
+            [1-"$number_of_list_items"] ) break;;
+            b|B) break;;
+        esac
+    done
+    return
+}
 #------------------------------------------------------------------------------
 # MAIN LOGIC
 #------------------------------------------------------------------------------
@@ -130,7 +166,9 @@ do
         a|A) add_item;;
         d|D) delete_item;;
         c|C) complete_item;;
+        p|P) enter_prioritize_mode;;
         x|X) write_list_to_file;;
+
         *) bad_choice;;
     esac
 done
