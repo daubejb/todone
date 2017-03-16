@@ -19,9 +19,15 @@ only_on_load=true
 # MENU FUNCTION DEFINITIONS
 #------------------------------------------------------------------------------
 
-function read_list_from_file () {
-    mapfile -t ITEMS < file.txt
-    while IFS= read -r line; do echo ">>$line<<"; done < file.txt
+function read_items_from_file () {
+    ITEMS=()
+    filename="file.txt"
+    readarray -t lines < "$filename"
+    for line in "${lines[@]}"; do
+        length_of_line=${#line}
+        [[ "$line" != "C "* ]] && ITEMS+=("${line}")
+        [[ "$line" == "C "* ]] && COMPLETED_ITEMS+=("${line:2:$length_of_line}")
+    done
 }
 
 function bad_choice () { MSG="Invalid Selection ... Please Try Again" ; }
@@ -77,6 +83,9 @@ function write_list_to_file () {
     for ((i=0; i < ${#ITEMS[@]}; ++i)); do
         export_string+="${ITEMS[$i]}\n"
     done
+    for ((i=0; i < ${#COMPLETED_ITEMS[@]}; ++i)); do
+        export_string+="C ${COMPLETED_ITEMS[$i]}\n"
+    done
     printf "${export_string}" > ~/file.txt
     clear
     break
@@ -109,7 +118,7 @@ function show_main_menu_options () {
 # MAIN LOGIC
 #------------------------------------------------------------------------------
 
-read_list_from_file
+read_items_from_file
 while true
 do
     show_todo_list
