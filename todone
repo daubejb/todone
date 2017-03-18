@@ -54,9 +54,11 @@ function add_item () {
     echo
     show_todo_list
     echo
+    printf "ADD AN ITEM\n"
+    echo
     printf "$CANCEL\n"
     echo
-    printf "Enter an item to add then press ENTER:\n"
+    printf "Enter an item then press ENTER --> "
     read item
     if [[ $item -eq "c" ]]; then
         return
@@ -74,9 +76,11 @@ function delete_item () {
         echo
         printf "$CANCEL\n"
         echo
+        printf "DELETE AN ITEM\n"
+        echo
         display_msg
         echo
-        printf "Enter an item number to delete then press ENTER:\n"
+        printf "Enter an item # to delete then press ENTER --> "
         read item
         case $item in
             c|C)
@@ -93,13 +97,19 @@ function delete_item () {
 }
 
 function finish_item () {
+    NOW=$(date +"%d %b %Y - %H:%M")
+    echo
     show_todo_list
     show_finished_items
     echo
-    printf "Enter a item number to finish then press ENTER:\n"
+    printf "FINISH AN ITEM\n"
+    echo
+    display_msg
+    echo
+    printf "Enter a item # then press ENTER --> "
     read item
     item_to_finish=$((item-1))
-    FINISHED_ITEMS+=("${ITEMS[$item_to_finish]}")
+    FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} - $NOW")
     ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
     + 1))}")
     show_todo_list
@@ -144,7 +154,7 @@ function show_finished_items () {
 }
 
 function show_main_menu_options () {
-    echo "Please select:"
+    echo "Commands:"
     echo
     printf "\t${ADD_MENU}\n"
     printf "\t${DELETE_MENU}\n"
@@ -153,7 +163,7 @@ function show_main_menu_options () {
     printf "\t(x) - to exit\n"
     echo
     display_msg
-    printf "Enter a letter then ENTER to perform an action:\n"
+    printf "Enter a command --> "
     return
 }
 
@@ -213,7 +223,7 @@ function select_item_to_prioritize () {
             echo $item_to_prioritize "|" ${#ITEMS[@]}
             echo
             printf "Press (k)- up or (j)- down to prioritize the selection or (b)
-            to go back:\n"
+            to go back --> "
             respond_to_priority_key_press
     done
     clear
@@ -223,7 +233,7 @@ function select_item_to_prioritize () {
     printf "$CANCEL\n"
     echo
     display_msg
-    printf "Enter an item # to prioritize then press ENTER:\n"
+    printf "Enter an item # to prioritize then press ENTER --> "
     return
 }
 
