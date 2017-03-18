@@ -44,6 +44,12 @@ function read_items_from_file () {
 
 function bad_choice () { MSG="Invalid Selection ... Please Try Again" ; }
 
+function display_msg () {
+    if [ "${MSG}" ]; then
+        printf "${MSG}\n"
+        echo
+    fi
+}
 function add_item () {
     echo
     show_todo_list
@@ -60,18 +66,30 @@ function add_item () {
 }
 
 function delete_item () { 
-    show_todo_list
-    echo
-    printf "$CANCEL\n"
-    echo
-    printf "Enter an item number to delete then press ENTER:\n"
-    read item
-    if [[ $item -eq "c" ]]; then
-        return
-    else
-        item_to_delete=$(($item -1))
-        ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete + 1))}")
-    fi
+    number_of_list_items=${#ITEMS[@]}
+    while true
+    do
+        echo
+        show_todo_list
+        echo
+        printf "$CANCEL\n"
+        echo
+        display_msg
+        echo
+        printf "Enter an item number to delete then press ENTER:\n"
+        read item
+        case $item in
+            c|C)
+                return;;
+            [1-"$number_of_list_items"])    
+                item_to_delete=$(($item -1))
+                ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete \
+                + 1))}")
+                MSG=
+                return;;
+            *) bad_choice;;
+        esac
+    done
 }
 
 function finish_item () {
@@ -134,10 +152,7 @@ function show_main_menu_options () {
     printf "\t${PRIORITIZE_MENU}\n"
     printf "\t(x) - to exit\n"
     echo
-    if [ "${MSG}" ]; then
-        printf "${MSG}\n"
-        echo
-    fi
+    display_msg
     printf "Enter a letter then ENTER to perform an action:\n"
     return
 }
@@ -205,7 +220,10 @@ function select_item_to_prioritize () {
     echo
     show_todo_list
     echo
-    printf "Enter an item # to prioritize OR press (b) to go back then press ENTER:\n"
+    printf "$CANCEL\n"
+    echo
+    display_msg
+    printf "Enter an item # to prioritize then press ENTER:\n"
     return
 }
 
@@ -222,7 +240,8 @@ function enter_prioritize_mode () {
         case $answer in
             [1-"$number_of_list_items"] ) 
                 item_to_prioritize=$(( $answer-1 ));;
-            b|B) break;;
+            c|C) break;;
+            *) bad_choice;;
         esac
     done
     return
