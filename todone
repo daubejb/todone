@@ -24,7 +24,7 @@ RS="\e[0m"
 ITEMS=()
 COMPLETED_ITEMS=()
 MSG=
-item_to_highlight=-1
+item_to_prioritize=-1
 MODE="normal"
 
 # MENU FUNCTION DEFINITIONS
@@ -79,7 +79,7 @@ function print_a_list ()  {
     array=("$@")
     for ((i=0; i < ${#array[@]}; ++i)); do
         position=$(( $i + 1 ))
-        if [ $i == $item_to_highlight ]; then
+        if [ $i == $item_to_prioritize ]; then
             printf "\t$PURPLE_BACKGROUND$position. ${array[$i]}$RS\n"
         else
             printf "\t$position. ${array[$i]}\n"
@@ -130,10 +130,67 @@ function show_main_menu_options () {
     return
 }
 
-function show_prioritize_menu_options () {
+function move_item_up () {
+    if [ $item_to_prioritize -eq 0 ]; then
+        return
+    else
+        item_to_exchange=$(( $item_to_prioritize-1 ))
+        swapper=$item_to_prioritize
+        swappee=$item_to_exchange
+        TEMP_ITEMS=("${ITEMS[@]:0:$swappee}" "${ITEMS[$swapper]}" "${ITEMS[$swappee]}" \
+        "${ITEMS[@]:$(($swapper + 1))}")
+        ITEMS=("${TEMP_ITEMS[@]}")
+        item_to_prioritize=$((item_to_prioritize-1))
+    fi
+}
+    
+    
+function move_item_down () {
+    if [[ $item_to_prioritize -eq ${#ITEMS[@]}-1 ]]; then
+        return
+    else
+        item_to_exchange=$(( $item_to_prioritize+1 ))
+        swapper=$item_to_prioritize
+        swappee=$item_to_exchange
+        TEMP_ITEMS=("${ITEMS[@]:0:$swapper}" "${ITEMS[$swappee]}" "${ITEMS[$swapper]}" \
+        "${ITEMS[@]:$(($swappee + 1))}")
+        ITEMS=("${TEMP_ITEMS[@]}")
+        item_to_prioritize=$((item_to_prioritize+1))
+    fi
+}
+
+function respond_to_priority_key_press () {
+    read -s -n 1 key
+    case $key in
+        j|J) move_item_down;;
+        k|K) move_item_up;;
+        b|B) return;;
+        *) bad_choice;;
+    esac
+    return
+}
+
+function select_item_to_prioritize () {
+    clear
     echo
+    show_todo_list
     echo
-    printf "Enter a item # to prioritize:\n"
+    if [ $item_to_prioritize -gt -1 ]; then
+        while true
+        do
+            clear
+            echo
+            show_todo_list
+            echo
+            echo $item_to_prioritize "|" ${#ITEMS[@]}
+            echo
+            printf "Press (k)- up or (j)- down to prioritize the selection or (b)
+            to go back:\n"
+            respond_to_priority_key_press
+        done
+    else
+        printf "Enter a item # to prioritize OR press (b) to go back then press ENTER:\n"
+    fi
     return
 }
 
@@ -144,12 +201,12 @@ function enter_prioritize_mode () {
     while true
     do
         show_todo_list
-        show_prioritize_menu_options
+        select_item_to_prioritize
         read answer
         MSG=
         case $answer in
             [1-"$number_of_list_items"] ) 
-                item_to_highlight=$(( $answer-1 ))
+                item_to_prioritize=$(( $answer-1 ))
                 enter_prioritize_mode ;;
             b|B) break;;
         esac
