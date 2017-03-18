@@ -13,19 +13,20 @@
 
 ADD_MENU="(a) - Add an item"
 DELETE_MENU="(d) - Delete an item"
-COMPLETE_MENU="(c) - Complete an item"
+FINISH_MENU="(f) - Finish an item"
 PRIORITIZE_MENU="(p) - Prioritize list"
-PURPLE_BACKGROUND="\e[45m"
-RS="\e[0m"
+CANCEL="(c) - Cancel and go back"
 
 # GLOBAL VARIABLES
 #------------------------------------------------------------------------------
 
 ITEMS=()
-COMPLETED_ITEMS=()
+FINISHED_ITEMS=()
 MSG=
 item_to_prioritize=-1
 MODE="normal"
+PURPLE_BACKGROUND="\e[45m"
+RS="\e[0m"
 
 # MENU FUNCTION DEFINITIONS
 #------------------------------------------------------------------------------
@@ -37,44 +38,56 @@ function read_items_from_file () {
     for line in "${lines[@]}"; do
         length_of_line=${#line}
         [[ "$line" != "C "* ]] && ITEMS+=("${line}")
-        [[ "$line" == "C "* ]] && COMPLETED_ITEMS+=("${line:2:$length_of_line}")
+        [[ "$line" == "C "* ]] && FINISHED_ITEMS+=("${line:2:$length_of_line}")
     done
 }
 
 function bad_choice () { MSG="Invalid Selection ... Please Try Again" ; }
 
 function add_item () {
+    echo
     show_todo_list
     echo
-    printf "Enter an item to add to the list:\n"
+    printf "$CANCEL\n"
+    echo
+    printf "Enter an item to add then press ENTER:\n"
     read item
-    ITEMS+=("${item}")
-    show_todo_list
+    if [[ $item -eq "c" ]]; then
+        return
+    else
+        ITEMS+=("${item}")
+    fi
 }
 
 function delete_item () { 
     show_todo_list
     echo
-    printf "Enter an number then ENTER to delete an item:\n"
+    printf "$CANCEL\n"
+    echo
+    printf "Enter an item number to delete then press ENTER:\n"
     read item
-    item_to_delete=$(($item -1))
-    ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete + 1))}")
-    show_todo_list
+    if [[ $item -eq "c" ]]; then
+        return
+    else
+        item_to_delete=$(($item -1))
+        ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete + 1))}")
+    fi
 }
 
-function complete_item () {
+function finish_item () {
     show_todo_list
-    show_completed_items
+    show_finished_items
     echo
-    printf "Enter a number then ENTER to complete an item:\n"
+    printf "Enter a item number to finish then press ENTER:\n"
     read item
-    item_to_complete=$(($item -1))
-    COMPLETED_ITEMS+=("${ITEMS[$item_to_complete]}")
-    ITEMS=("${ITEMS[@]:0:$item_to_complete}" "${ITEMS[@]:$(($item_to_complete \
+    item_to_finish=$((item-1))
+    FINISHED_ITEMS+=("${ITEMS[$item_to_finish]}")
+    ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
     + 1))}")
     show_todo_list
-    show_completed_items
+    show_finished_items
 }
+
 function print_a_list ()  {
     array=("$@")
     for ((i=0; i < ${#array[@]}; ++i)); do
@@ -98,27 +111,26 @@ function write_list_to_file () {
     for ((i=0; i < ${#ITEMS[@]}; ++i)); do
         export_string+="${ITEMS[$i]}\n"
     done
-    for ((i=0; i < ${#COMPLETED_ITEMS[@]}; ++i)); do
-        export_string+="C ${COMPLETED_ITEMS[$i]}\n"
+    for ((i=0; i < ${#FINISHED_ITEMS[@]}; ++i)); do
+        export_string+="C ${FINISHED_ITEMS[$i]}\n"
     done
     printf "${export_string}" > ~/file.txt
     clear
     break
 }
 
-function show_completed_items () {
-    printf "\nCompleted:\n\n"
-    print_a_list "${COMPLETED_ITEMS[@]}"
+function show_finished_items () {
+    printf "\nFinished:\n\n"
+    print_a_list "${FINISHED_ITEMS[@]}"
     echo
 }
 
 function show_main_menu_options () {
-    echo
     echo "Please select:"
     echo
     printf "\t${ADD_MENU}\n"
     printf "\t${DELETE_MENU}\n"
-    printf "\t${COMPLETE_MENU}\n"
+    printf "\t${FINISH_MENU}\n"
     printf "\t${PRIORITIZE_MENU}\n"
     printf "\t(x) - to exit\n"
     echo
@@ -192,7 +204,8 @@ function select_item_to_prioritize () {
     clear
     echo
     show_todo_list
-    printf "Enter a item # to prioritize OR press (b) to go back then press ENTER:\n"
+    echo
+    printf "Enter an item # to prioritize OR press (b) to go back then press ENTER:\n"
     return
 }
 
@@ -222,14 +235,14 @@ read_items_from_file
 while true
 do
     show_todo_list
-    show_completed_items
+    show_finished_items
     show_main_menu_options
-    read answer
+    read -s -n 1 answer
     MSG=
     case $answer in
         a|A) add_item;;
         d|D) delete_item;;
-        c|C) complete_item;;
+        f|F) finish_item;;
         p|P) enter_prioritize_mode;;
         x|X) write_list_to_file;;
 
