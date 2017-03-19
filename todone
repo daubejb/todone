@@ -11,11 +11,11 @@
 # MENU PROMPTS
 #------------------------------------------------------------------------------
 
-ADD_MENU="(a) - Add an item"
-DELETE_MENU="(d) - Delete an item"
-FINISH_MENU="(f) - Finish an item"
-PRIORITIZE_MENU="(p) - Prioritize list"
-CANCEL="(c) - Cancel and go back"
+ADD_MENU="(a) Add an item"
+DELETE_MENU="(d) Delete an item"
+FINISH_MENU="(f) Finish an item"
+PRIORITIZE_MENU="(p) Prioritize list"
+CANCEL="\t(c) Cancel"
 
 # GLOBAL VARIABLES
 #------------------------------------------------------------------------------
@@ -74,9 +74,9 @@ function delete_item () {
         echo
         show_todo_list
         echo
-        printf "$CANCEL\n"
-        echo
         printf "DELETE AN ITEM\n"
+        echo
+        printf "$CANCEL\n"
         echo
         display_msg
         echo
@@ -97,23 +97,34 @@ function delete_item () {
 }
 
 function finish_item () {
-    NOW=$(date +"%d %b %Y - %H:%M")
-    echo
-    show_todo_list
-    show_finished_items
-    echo
-    printf "FINISH AN ITEM\n"
-    echo
-    display_msg
-    echo
-    printf "Enter a item # then press ENTER --> "
-    read item
-    item_to_finish=$((item-1))
-    FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} - $NOW")
-    ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
-    + 1))}")
-    show_todo_list
-    show_finished_items
+    NOW=$(date +"(%Y-%m-%d - %H:%M)")
+    number_of_list_items=${#ITEMS[@]}
+    while true
+    do
+        echo
+        show_todo_list
+        show_finished_items
+        printf "FINISH AN ITEM\n"
+        echo
+        printf "$CANCEL\n"
+        echo
+        display_msg
+        echo
+        printf "Enter a item # then press ENTER --> "
+        read item
+        case $item in
+            c|C)
+                return;;
+            [1-"$number_of_list_items"])
+                item_to_finish=$((item-1))
+                FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} $NOW")
+                ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
+                + 1))}")
+                MSG=
+                return;;
+            *) bad_choice;;
+        esac
+    done
 }
 
 function print_a_list ()  {
@@ -148,7 +159,7 @@ function write_list_to_file () {
 }
 
 function show_finished_items () {
-    printf "\nFinished:\n\n"
+    printf "\nDone:\n\n"
     print_a_list "${FINISHED_ITEMS[@]}"
     echo
 }
@@ -160,7 +171,7 @@ function show_main_menu_options () {
     printf "\t${DELETE_MENU}\n"
     printf "\t${FINISH_MENU}\n"
     printf "\t${PRIORITIZE_MENU}\n"
-    printf "\t(x) - to exit\n"
+    printf "\t(x) Exit\n"
     echo
     display_msg
     printf "Enter a command --> "
@@ -229,6 +240,8 @@ function select_item_to_prioritize () {
     clear
     echo
     show_todo_list
+    echo
+    printf "PRIORITIZE AN ITEM\n"
     echo
     printf "$CANCEL\n"
     echo
