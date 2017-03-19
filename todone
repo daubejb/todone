@@ -4,14 +4,12 @@
 # Todo -
 # 1. Add ability to launch todone from anywhere and have file.txt source from
 # ~/ directory
-# 2. Add ability to prioritize items; rearange them
-# 3. Upon completion: append date time to end of item
-
 
 # MENU PROMPTS
 #------------------------------------------------------------------------------
 
 ADD_MENU="(a) Add an item"
+EDIT_MENU="(e) Edit an item"
 DELETE_MENU="(d) Delete an item"
 FINISH_MENU="(f) Finish an item"
 PRIORITIZE_MENU="(p) Prioritize list"
@@ -50,6 +48,7 @@ function display_msg () {
         echo
     fi
 }
+
 function add_item () {
     echo
     show_todo_list
@@ -65,6 +64,33 @@ function add_item () {
     else
         ITEMS+=("${item}")
     fi
+}
+
+function edit_item () {
+    number_of_list_items=${#ITEMS[@]}
+    while true
+    do
+        echo
+        show_todo_list
+        echo
+        printf "EDIT AN ITEM\n"
+        echo
+        printf "$CANCEL\n"
+        echo
+        display_msg
+        echo
+        printf "Enter an item # then press ENTER --> "
+        read item
+        case $item in
+            c|C)
+                MSG=
+                return;;
+            [1-"$number_of_list_items"])
+                MSG=
+                return;;
+            *) bad_choice;;
+        esac
+    done
 }
 
 function delete_item () { 
@@ -84,6 +110,7 @@ function delete_item () {
         read item
         case $item in
             c|C)
+                MSG=
                 return;;
             [1-"$number_of_list_items"])    
                 item_to_delete=$(($item -1))
@@ -114,6 +141,7 @@ function finish_item () {
         read item
         case $item in
             c|C)
+                MSG=
                 return;;
             [1-"$number_of_list_items"])
                 item_to_finish=$((item-1))
@@ -168,6 +196,7 @@ function show_main_menu_options () {
     echo "Commands:"
     echo
     printf "\t${ADD_MENU}\n"
+    printf "\t${EDIT_MENU}\n"
     printf "\t${DELETE_MENU}\n"
     printf "\t${FINISH_MENU}\n"
     printf "\t${PRIORITIZE_MENU}\n"
@@ -283,6 +312,7 @@ do
     MSG=
     case $answer in
         a|A) add_item;;
+        e|E) edit_item;;
         d|D) delete_item;;
         f|F) finish_item;;
         p|P) enter_prioritize_mode;;
