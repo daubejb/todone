@@ -169,7 +169,7 @@ function print_a_list ()  {
 function show_todo_list () {
     clear
     echo
-    printf "\nTo-Do List:\n\n"
+    printf "\nTO-DO\n\n"
     print_a_list "${ITEMS[@]}"
 }
 
@@ -187,13 +187,13 @@ function write_list_to_file () {
 }
 
 function show_finished_items () {
-    printf "\nDone:\n\n"
+    printf "\nDONE\n\n"
     print_a_list "${FINISHED_ITEMS[@]}"
     echo
 }
 
 function show_main_menu_options () {
-    echo "Commands:"
+    echo "ACTIONS"
     echo
     printf "\t${ADD_MENU}\n"
     printf "\t${EDIT_MENU}\n"
