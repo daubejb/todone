@@ -106,20 +106,23 @@ function delete_item () {
         echo
         display_msg
         echo
+        echo $item
+        echo
+        printf $number_of_list_items
         printf "Enter an item # to delete then press ENTER --> "
         read item
-        case $item in
-            c|C)
-                MSG=
-                return;;
-            [1-"$number_of_list_items"])    
-                item_to_delete=$(($item -1))
-                ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete \
-                + 1))}")
-                MSG=
-                return;;
-            *) bad_choice;;
-        esac
+        if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
+            item_to_delete=$(($item-1))
+            ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete \
+            + 1))}")
+            MSG=
+            return
+        elif [ "$item" = "c" ] || [ "$item" = "C" ]; then
+            MSG=
+            return
+        else
+            bad_choice
+        fi
     done
 }
 
@@ -139,19 +142,19 @@ function finish_item () {
         echo
         printf "Enter a item # then press ENTER --> "
         read item
-        case $item in
-            c|C)
-                MSG=
-                return;;
-            [1-"$number_of_list_items"])
-                item_to_finish=$((item-1))
-                FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} $NOW")
-                ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
-                + 1))}")
-                MSG=
-                return;;
-            *) bad_choice;;
-        esac
+        if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
+            item_to_finish=$((item-1))
+            FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} $NOW")
+            ITEMS=("${ITEMS[@]:0:$item_to_finish}" "${ITEMS[@]:$(($item_to_finish \
+            + 1))}")
+            MSG=
+            return
+        elif [ "$item" = "c" ] || [ "$item" = "C" ]; then
+            MSG=
+            return
+        else
+            bad_choice
+        fi
     done
 }
 
