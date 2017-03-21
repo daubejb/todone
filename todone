@@ -49,8 +49,13 @@ function display_msg () {
     fi
 }
 
-function add_item () {
+function prompt_for_item_number () {
     echo
+    printf "Enter an item # then press Enter --> "
+    read item
+}
+
+function add_item () {
     show_todo_list
     echo
     printf "ADD AN ITEM\n"
@@ -70,7 +75,6 @@ function edit_item () {
     number_of_list_items=${#ITEMS[@]}
     while true
     do
-        echo
         show_todo_list
         echo
         printf "EDIT AN ITEM\n"
@@ -78,18 +82,19 @@ function edit_item () {
         printf "$CANCEL\n"
         echo
         display_msg
-        echo
-        printf "Enter an item # then press ENTER --> "
-        read item
-        case $item in
-            c|C)
-                MSG=
-                return;;
-            [1-"$number_of_list_items"])
-                MSG=
-                return;;
-            *) bad_choice;;
-        esac
+        prompt_for_item_number
+        if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
+            item_to_edit=$(($item-1))
+            printf "$item"
+            read henry
+            MSG=
+            return
+        elif [ "$item" = "c" ] || [ "$item" = "C" ]; then
+            MSG=
+            return
+        else
+            bad_choice
+        fi
     done
 }
 
@@ -97,7 +102,6 @@ function delete_item () {
     number_of_list_items=${#ITEMS[@]}
     while true
     do
-        echo
         show_todo_list
         echo
         printf "DELETE AN ITEM\n"
@@ -105,12 +109,7 @@ function delete_item () {
         printf "$CANCEL\n"
         echo
         display_msg
-        echo
-        echo $item
-        echo
-        printf $number_of_list_items
-        printf "Enter an item # to delete then press ENTER --> "
-        read item
+        prompt_for_item_number
         if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
             item_to_delete=$(($item-1))
             ITEMS=("${ITEMS[@]:0:$item_to_delete}" "${ITEMS[@]:$(($item_to_delete \
@@ -131,7 +130,6 @@ function finish_item () {
     number_of_list_items=${#ITEMS[@]}
     while true
     do
-        echo
         show_todo_list
         show_finished_items
         printf "FINISH AN ITEM\n"
@@ -139,9 +137,7 @@ function finish_item () {
         printf "$CANCEL\n"
         echo
         display_msg
-        echo
-        printf "Enter a item # then press ENTER --> "
-        read item
+        prompt_for_item_number
         if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
             item_to_finish=$((item-1))
             FINISHED_ITEMS+=("${ITEMS[$item_to_finish]} $NOW")
@@ -172,6 +168,7 @@ function print_a_list ()  {
 
 function show_todo_list () {
     clear
+    echo
     printf "\nTo-Do List:\n\n"
     print_a_list "${ITEMS[@]}"
 }
@@ -203,7 +200,7 @@ function show_main_menu_options () {
     printf "\t${DELETE_MENU}\n"
     printf "\t${FINISH_MENU}\n"
     printf "\t${PRIORITIZE_MENU}\n"
-    printf "\t(x) Exit\n"
+    printf "\t(q) Quit\n"
     echo
     display_msg
     printf "Enter a command --> "
@@ -319,7 +316,7 @@ do
         d|D) delete_item;;
         f|F) finish_item;;
         p|P) enter_prioritize_mode;;
-        x|X) write_list_to_file;;
+        q|Q) write_list_to_file;;
 
         *) bad_choice;;
     esac
