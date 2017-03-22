@@ -168,6 +168,15 @@ function finish_item () {
     done
 }
 
+function reverse_print_a_list () {
+    array=("$@")
+    position=1
+    for ((i=$((${#array[@]}-1)); i >= 0; --i)); do
+        printf "\t$position. ${array[$i]}\n"    
+        position=$(($position+1))
+    done
+}
+
 function print_a_list ()  {
     array=("$@")
     for ((i=0; i < ${#array[@]}; ++i)); do
@@ -202,7 +211,7 @@ function write_list_to_file () {
 
 function show_finished_items () {
     printf "\nDONE\n\n"
-    print_a_list "${FINISHED_ITEMS[@]}"
+    reverse_print_a_list "${FINISHED_ITEMS[@]}"
     echo
 }
 
