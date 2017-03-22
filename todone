@@ -71,6 +71,22 @@ function add_item () {
     fi
 }
 
+function edit_item_text () {
+    item_to_edit = $1
+    clear
+    show_todo_list
+    echo
+    printf "EDIT ITEM TEXT\n"
+    echo
+    printf "$CANCEL\n"
+    echo
+    display_msg
+    echo
+    read -p "Edit the To-Do text: " -e -i "${ITEMS[$item_to_edit]}" edited_item
+    printf "$edited_item"
+    read hello
+}
+
 function edit_item () {
     number_of_list_items=${#ITEMS[@]}
     while true
@@ -85,8 +101,7 @@ function edit_item () {
         prompt_for_item_number
         if [ "$item" -ge 1 -a "$item" -le "$number_of_list_items" ]; then
             item_to_edit=$(($item-1))
-            printf "$item"
-            read henry
+            edit_item_text $item_to_edit
             MSG=
             return
         elif [ "$item" = "c" ] || [ "$item" = "C" ]; then
