@@ -83,8 +83,7 @@ function edit_item_text () {
     display_msg
     echo
     read -p "Edit the To-Do text: " -e -i "${ITEMS[$item_to_edit]}" edited_item
-    printf "$edited_item"
-    read hello
+    ITEMS[$item_to_edit]="${edited_item}"
 }
 
 function edit_item () {
