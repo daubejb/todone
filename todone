@@ -255,7 +255,7 @@ function respond_to_priority_key_press () {
     case $key in
         j|J) move_item_down;;
         k|K) move_item_up;;
-        b|B) 
+        c|C) 
             item_to_prioritize=-1
             break;;
         *) bad_choice;;
@@ -274,10 +274,13 @@ function select_item_to_prioritize () {
             echo
             show_todo_list
             echo
-            echo $item_to_prioritize "|" ${#ITEMS[@]}
+            printf "ACTIONS\n"
             echo
-            printf "Press (k)- up or (j)- down to prioritize the selection or (b)
-            to go back --> "
+            printf "\t(j) - move item down\n"
+            printf "\t(k) - move item up\n"
+            printf "\t(c) - complete and go back\n"
+            echo
+            printf "Enter a command --> "
             respond_to_priority_key_press
     done
     clear
@@ -303,12 +306,14 @@ function enter_prioritize_mode () {
         select_item_to_prioritize
         read answer
         MSG=
-        case $answer in
-            [1-"$number_of_list_items"] ) 
-                item_to_prioritize=$(( $answer-1 ));;
-            c|C) break;;
-            *) bad_choice;;
-        esac
+        if [ "$answer" -ge 1 -a "$answer" -le "$number_of_list_items" ]; then
+            item_to_prioritize=$(( $answer-1 ))
+        elif [ "$answer" = "c" ] || [ "$answer" = "C" ]; then
+            MSG=
+            return
+        else
+            bad_choice
+        fi
     done
     return
 }
