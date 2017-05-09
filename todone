@@ -32,14 +32,27 @@ FINISHED_ITEMS=()
 MSG=
 item_to_prioritize=-1
 MODE="normal"
+FILEDB="$HOME/file.txt"
+
+function init_files() {
+	if [ -f todonerc ]
+	then
+		. todonerc
+		FILEDB=${filename}
+	fi
+
+	if [ ! -f $FILEDB ]
+	then
+		touch $FILEDB
+	fi
+}
 
 # MENU FUNCTION DEFINITIONS
 #------------------------------------------------------------------------------
 
 function read_items_from_file () {
     ITEMS=()
-    filename="file.txt"
-    readarray -t lines < "$filename"
+    readarray -t lines < "$FILEDB"
     for line in "${lines[@]}"; do
         length_of_line=${#line}
         [[ "$line" != "C "* ]] && ITEMS+=("${line}")
@@ -211,7 +224,7 @@ function write_list_to_file () {
     for ((i=0; i < ${#FINISHED_ITEMS[@]}; ++i)); do
         export_string+="C ${FINISHED_ITEMS[$i]}\n"
     done
-    printf "${export_string}" > ~/file.txt
+    printf "${export_string}" > "${FILEDB}"
     clear
     break
 }
@@ -337,6 +350,7 @@ function enter_prioritize_mode () {
 # MAIN LOGIC
 #------------------------------------------------------------------------------
 
+init_files
 read_items_from_file
 while true
 do
