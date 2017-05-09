@@ -5,15 +5,24 @@
 # 1. Add ability to launch todone from anywhere and have file.txt source from
 # ~/ directory
 
+# COLORS
+#------------------------------------------------------------------------------
+
+PURPLE_BACKGROUND="\e[45m"
+YELLOW_TEXT="\e[1;33m"
+PURPLE_TEXT="\e[1;35m"
+RS="\e[0m"
+
 # MENU PROMPTS
 #------------------------------------------------------------------------------
 
-ADD_MENU="(a) Add an item"
-EDIT_MENU="(e) Edit an item"
-DELETE_MENU="(d) Delete an item"
-FINISH_MENU="(f) Finish an item"
-PRIORITIZE_MENU="(p) Prioritize list"
-CANCEL="\t(c) Cancel"
+ADD_MENU="(${YELLOW_TEXT}a$RS) Add an item"
+EDIT_MENU="(${YELLOW_TEXT}e$RS) Edit an item"
+DELETE_MENU="(${YELLOW_TEXT}d$RS) Delete an item"
+FINISH_MENU="(${YELLOW_TEXT}f$RS) Finish an item"
+PRIORITIZE_MENU="(${YELLOW_TEXT}p$RS) Prioritize list"
+QUIT_MENU="(${YELLOW_TEXT}q$RS) Quit"
+CANCEL="\t(${YELLOW_TEXT}c$RS) Cancel"
 
 # GLOBAL VARIABLES
 #------------------------------------------------------------------------------
@@ -23,8 +32,6 @@ FINISHED_ITEMS=()
 MSG=
 item_to_prioritize=-1
 MODE="normal"
-PURPLE_BACKGROUND="\e[45m"
-RS="\e[0m"
 
 # MENU FUNCTION DEFINITIONS
 #------------------------------------------------------------------------------
@@ -51,18 +58,18 @@ function display_msg () {
 
 function prompt_for_item_number () {
     echo
-    printf "Enter an item # then press Enter --> "
+    printf "Enter an item # then press Enter${YELLOW_TEXT}-->$RS "
     read item
 }
 
 function add_item () {
     show_todo_list
     echo
-    printf "ADD AN ITEM\n"
+    printf "${YELLOW_TEXT}ADD AN ITEM$RS\n"
     echo
     printf "$CANCEL\n"
     echo
-    printf "Enter an item then press ENTER --> "
+    printf "Enter an item then press ENTER${YELLOW_TEXT} -->$RS "
     read item
     if [[ $item -eq "c" ]]; then
         return
@@ -76,7 +83,7 @@ function edit_item_text () {
     clear
     show_todo_list
     echo
-    printf "EDIT ITEM TEXT\n"
+    printf "${YELLOW_TEXT}EDIT ITEM TEXT$RS\n"
     echo
     printf "$CANCEL\n"
     echo
@@ -92,7 +99,7 @@ function edit_item () {
     do
         show_todo_list
         echo
-        printf "EDIT AN ITEM\n"
+        printf "${YELLOW_TEXT}EDIT AN ITEM$RS\n"
         echo
         printf "$CANCEL\n"
         echo
@@ -118,7 +125,7 @@ function delete_item () {
     do
         show_todo_list
         echo
-        printf "DELETE AN ITEM\n"
+        printf "${YELLOW_TEXT}DELETE AN ITEM$RS\n"
         echo
         printf "$CANCEL\n"
         echo
@@ -146,7 +153,7 @@ function finish_item () {
     do
         show_todo_list
         show_finished_items
-        printf "FINISH AN ITEM\n"
+        printf "${YELLOW_TEXT}FINISH AN ITEM$RS\n"
         echo
         printf "$CANCEL\n"
         echo
@@ -192,7 +199,7 @@ function print_a_list ()  {
 function show_todo_list () {
     clear
     echo
-    printf "\nTO-DO\n\n"
+    printf "\n${PURPLE_TEXT}TO-DO$RS\n\n"
     print_a_list "${ITEMS[@]}"
 }
 
@@ -210,23 +217,23 @@ function write_list_to_file () {
 }
 
 function show_finished_items () {
-    printf "\nDONE\n\n"
+    printf "\n${PURPLE_TEXT}DONE$RS\n\n"
     reverse_print_a_list "${FINISHED_ITEMS[@]}"
     echo
 }
 
 function show_main_menu_options () {
-    echo "ACTIONS"
+    printf "${PURPLE_TEXT}ACTIONS$RS\n"
     echo
     printf "\t${ADD_MENU}\n"
     printf "\t${EDIT_MENU}\n"
     printf "\t${DELETE_MENU}\n"
     printf "\t${FINISH_MENU}\n"
     printf "\t${PRIORITIZE_MENU}\n"
-    printf "\t(q) Quit\n"
+    printf "\t${QUIT_MENU}\n"
     echo
     display_msg
-    printf "Enter a command --> "
+    printf "Enter a command${YELLOW_TEXT} -->$RS "
     return
 }
 
@@ -285,23 +292,23 @@ function select_item_to_prioritize () {
             echo
             printf "ACTIONS\n"
             echo
-            printf "\t(j) - move item down\n"
-            printf "\t(k) - move item up\n"
-            printf "\t(c) - complete and go back\n"
+            printf "\t(${YELLOW_TEXT}j$RS) - move item down\n"
+            printf "\t(${YELLOW_TEXT}k$RS) - move item up\n"
+            printf "\t(${YELLOW_TEXT}c$RS) - complete and go back\n"
             echo
-            printf "Enter a command --> "
+            printf "Enter a command${YELLOW_TEXT} -->$RS "
             respond_to_priority_key_press
     done
     clear
     echo
     show_todo_list
     echo
-    printf "PRIORITIZE AN ITEM\n"
+    printf "${YELLOW_TEXT}PRIORITIZE AN ITEM$RS\n"
     echo
     printf "$CANCEL\n"
     echo
     display_msg
-    printf "Enter an item # to prioritize then press ENTER --> "
+    printf "Enter an item # to prioritize then press ENTER${YELLOW_TEXT} -->$RS "
     return
 }
 
